@@ -1,4 +1,4 @@
-📈 PulseTrack — Real-Time Data Dashboard
+📈 PulseTrack Real-Time Data Dashboard
 
 PulseTrack is a modern, mobile-first data dashboard that fetches and visualizes live data from public APIs.
 It’s designed with a strong focus on clean dashboard UX, data clarity, and scalability.
