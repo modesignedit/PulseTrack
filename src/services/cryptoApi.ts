@@ -14,13 +14,14 @@ const BASE_URL = "https://api.coingecko.com/api/v3";
 
 // Simple in-memory cache to reduce API calls
 const cache = new Map<string, { data: unknown; timestamp: number }>();
-const CACHE_DURATION = 60 * 1000; // 1 minute cache
+const CACHE_DURATION = 3 * 60 * 1000; // 3 minute cache (increased for rate limiting)
+const CHART_CACHE_DURATION = 5 * 60 * 1000; // 5 minute cache for charts
 
 // Request queue to prevent rate limiting
 let lastRequestTime = 0;
-const MIN_REQUEST_INTERVAL = 1500; // 1.5 seconds between requests
+const MIN_REQUEST_INTERVAL = 2000; // 2 seconds between requests (increased)
 
-async function throttledFetch(url: string): Promise<Response> {
+async function throttledFetch(url: string, retries = 2): Promise<Response> {
   const now = Date.now();
   const timeSinceLastRequest = now - lastRequestTime;
   
@@ -30,22 +31,32 @@ async function throttledFetch(url: string): Promise<Response> {
   
   lastRequestTime = Date.now();
   
-  const response = await fetch(url);
-  
-  // Handle rate limiting with retry
-  if (response.status === 429) {
-    console.warn('Rate limited by CoinGecko, waiting before retry...');
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    lastRequestTime = Date.now();
-    return fetch(url);
+  try {
+    const response = await fetch(url);
+    
+    // Handle rate limiting with retry
+    if (response.status === 429 && retries > 0) {
+      console.warn('Rate limited by CoinGecko, waiting before retry...');
+      await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10 seconds
+      lastRequestTime = Date.now();
+      return throttledFetch(url, retries - 1);
+    }
+    
+    return response;
+  } catch (error) {
+    if (retries > 0) {
+      console.warn('Fetch failed, retrying...', error);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      return throttledFetch(url, retries - 1);
+    }
+    throw error;
   }
-  
-  return response;
 }
 
-function getCached<T>(key: string): T | null {
+function getCached<T>(key: string, customDuration?: number): T | null {
   const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+  const duration = customDuration || CACHE_DURATION;
+  if (cached && Date.now() - cached.timestamp < duration) {
     return cached.data as T;
   }
   cache.delete(key);
@@ -223,7 +234,7 @@ export async function fetchCoinChart(
   days: number | string = 7
 ): Promise<ChartData> {
   const cacheKey = `chart-${coinId}-${days}`;
-  const cached = getCached<ChartData>(cacheKey);
+  const cached = getCached<ChartData>(cacheKey, CHART_CACHE_DURATION);
   if (cached) return cached;
 
   const params = new URLSearchParams({
@@ -231,17 +242,27 @@ export async function fetchCoinChart(
     days: days.toString(),
   });
 
-  const response = await throttledFetch(
-    `${BASE_URL}/coins/${coinId}/market_chart?${params}`
-  );
+  try {
+    const response = await throttledFetch(
+      `${BASE_URL}/coins/${coinId}/market_chart?${params}`
+    );
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch chart data: ${response.status}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch chart data: ${response.status}`);
+    }
+
+    const data = await response.json();
+    setCache(cacheKey, data);
+    return data;
+  } catch (error) {
+    // Try to get from cache even if expired (stale data is better than no data)
+    const staleCache = cache.get(cacheKey);
+    if (staleCache) {
+      console.warn('Using stale cache for chart data');
+      return staleCache.data as ChartData;
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  setCache(cacheKey, data);
-  return data;
 }
 
 /**

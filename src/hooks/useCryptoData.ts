@@ -75,7 +75,10 @@ export function useCoinChart(coinId: string, days: number | string = 7) {
     queryKey: cryptoKeys.chart(coinId, days),
     queryFn: () => fetchCoinChart(coinId, days),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
     enabled: !!coinId, // Only fetch if coinId is provided
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(2000 * 2 ** attemptIndex, 30000),
   });
 }
 
