@@ -12,6 +12,50 @@
 // Base URL for CoinGecko API v3
 const BASE_URL = "https://api.coingecko.com/api/v3";
 
+// Simple in-memory cache to reduce API calls
+const cache = new Map<string, { data: unknown; timestamp: number }>();
+const CACHE_DURATION = 60 * 1000; // 1 minute cache
+
+// Request queue to prevent rate limiting
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 1500; // 1.5 seconds between requests
+
+async function throttledFetch(url: string): Promise<Response> {
+  const now = Date.now();
+  const timeSinceLastRequest = now - lastRequestTime;
+  
+  if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+    await new Promise(resolve => setTimeout(resolve, MIN_REQUEST_INTERVAL - timeSinceLastRequest));
+  }
+  
+  lastRequestTime = Date.now();
+  
+  const response = await fetch(url);
+  
+  // Handle rate limiting with retry
+  if (response.status === 429) {
+    console.warn('Rate limited by CoinGecko, waiting before retry...');
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    lastRequestTime = Date.now();
+    return fetch(url);
+  }
+  
+  return response;
+}
+
+function getCached<T>(key: string): T | null {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+    return cached.data as T;
+  }
+  cache.delete(key);
+  return null;
+}
+
+function setCache(key: string, data: unknown): void {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
 // Types for API responses
 export interface CoinMarketData {
   id: string;
@@ -126,6 +170,10 @@ export async function fetchTopCoins(
   perPage: number = 20,
   sparkline: boolean = true
 ): Promise<CoinMarketData[]> {
+  const cacheKey = `coins-${page}-${perPage}-${sparkline}`;
+  const cached = getCached<CoinMarketData[]>(cacheKey);
+  if (cached) return cached;
+
   const params = new URLSearchParams({
     vs_currency: "usd",
     order: "market_cap_desc",
@@ -134,13 +182,15 @@ export async function fetchTopCoins(
     sparkline: sparkline.toString(),
   });
 
-  const response = await fetch(`${BASE_URL}/coins/markets?${params}`);
+  const response = await throttledFetch(`${BASE_URL}/coins/markets?${params}`);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch coins: ${response.status}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  setCache(cacheKey, data);
+  return data;
 }
 
 /**
@@ -148,13 +198,19 @@ export async function fetchTopCoins(
  * Returns overall market statistics like total market cap and volume
  */
 export async function fetchGlobalData(): Promise<GlobalData> {
-  const response = await fetch(`${BASE_URL}/global`);
+  const cacheKey = 'global-data';
+  const cached = getCached<GlobalData>(cacheKey);
+  if (cached) return cached;
+
+  const response = await throttledFetch(`${BASE_URL}/global`);
   
   if (!response.ok) {
     throw new Error(`Failed to fetch global data: ${response.status}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  setCache(cacheKey, data);
+  return data;
 }
 
 /**
@@ -166,12 +222,16 @@ export async function fetchCoinChart(
   coinId: string,
   days: number | string = 7
 ): Promise<ChartData> {
+  const cacheKey = `chart-${coinId}-${days}`;
+  const cached = getCached<ChartData>(cacheKey);
+  if (cached) return cached;
+
   const params = new URLSearchParams({
     vs_currency: "usd",
     days: days.toString(),
   });
 
-  const response = await fetch(
+  const response = await throttledFetch(
     `${BASE_URL}/coins/${coinId}/market_chart?${params}`
   );
 
@@ -179,20 +239,27 @@ export async function fetchCoinChart(
     throw new Error(`Failed to fetch chart data: ${response.status}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  setCache(cacheKey, data);
+  return data;
 }
 
 /**
  * Fetch trending coins (based on search popularity)
  */
 export async function fetchTrendingCoins(): Promise<TrendingCoin[]> {
-  const response = await fetch(`${BASE_URL}/search/trending`);
+  const cacheKey = 'trending';
+  const cached = getCached<TrendingCoin[]>(cacheKey);
+  if (cached) return cached;
+
+  const response = await throttledFetch(`${BASE_URL}/search/trending`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch trending coins: ${response.status}`);
   }
 
   const data = await response.json();
+  setCache(cacheKey, data.coins);
   return data.coins;
 }
 
@@ -201,14 +268,19 @@ export async function fetchTrendingCoins(): Promise<TrendingCoin[]> {
  * @param query - Search query string
  */
 export async function searchCoins(query: string): Promise<SearchResult[]> {
+  const cacheKey = `search-${query}`;
+  const cached = getCached<SearchResult[]>(cacheKey);
+  if (cached) return cached;
+
   const params = new URLSearchParams({ query });
-  const response = await fetch(`${BASE_URL}/search?${params}`);
+  const response = await throttledFetch(`${BASE_URL}/search?${params}`);
 
   if (!response.ok) {
     throw new Error(`Failed to search coins: ${response.status}`);
   }
 
   const data = await response.json();
+  setCache(cacheKey, data.coins);
   return data.coins;
 }
 
@@ -217,6 +289,10 @@ export async function searchCoins(query: string): Promise<SearchResult[]> {
  * @param coinId - The coin ID (e.g., "bitcoin")
  */
 export async function fetchCoinDetails(coinId: string): Promise<CoinDetails> {
+  const cacheKey = `details-${coinId}`;
+  const cached = getCached<CoinDetails>(cacheKey);
+  if (cached) return cached;
+
   const params = new URLSearchParams({
     localization: "false",
     tickers: "false",
@@ -224,13 +300,15 @@ export async function fetchCoinDetails(coinId: string): Promise<CoinDetails> {
     developer_data: "false",
   });
 
-  const response = await fetch(`${BASE_URL}/coins/${coinId}?${params}`);
+  const response = await throttledFetch(`${BASE_URL}/coins/${coinId}?${params}`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch coin details: ${response.status}`);
   }
 
-  return response.json();
+  const data = await response.json();
+  setCache(cacheKey, data);
+  return data;
 }
 
 // Exchange rate types
@@ -247,17 +325,23 @@ export async function fetchExchangeRates(
   coinId: string,
   vsCurrencies: string = "usd,eur,gbp,jpy,aud,cad,chf,cny,inr,btc,eth,mxn,brl,sek,nok,dkk,pln,try,rub,krw,sgd,hkd,thb,idr,php,myr,aed,sar,zar,xau,xag,sats"
 ): Promise<ExchangeRates> {
+  const cacheKey = `rates-${coinId}`;
+  const cached = getCached<ExchangeRates>(cacheKey);
+  if (cached) return cached;
+
   const params = new URLSearchParams({
     ids: coinId,
     vs_currencies: vsCurrencies,
   });
 
-  const response = await fetch(`${BASE_URL}/simple/price?${params}`);
+  const response = await throttledFetch(`${BASE_URL}/simple/price?${params}`);
 
   if (!response.ok) {
     throw new Error(`Failed to fetch exchange rates: ${response.status}`);
   }
 
   const data = await response.json();
-  return data[coinId] || {};
+  const rates = data[coinId] || {};
+  setCache(cacheKey, rates);
+  return rates;
 }
