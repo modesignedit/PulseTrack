@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, TrendingUp, TrendingDown, ExternalLink, Copy, Check } from "lucide-react";
+import { ArrowLeft, Star, TrendingUp, TrendingDown, ExternalLink, Copy, Check, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCoinDetails, useCoinChart } from "@/hooks/useCryptoData";
 import { useWatchlist } from "@/hooks/useWatchlist";
+import { usePriceAlerts } from "@/hooks/usePriceAlerts";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -15,6 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Area, AreaChart, XAxis, YAxis, ResponsiveContainer, Bar, BarChart } from "recharts";
+import { PriceAlertDialog } from "@/components/dashboard/PriceAlertDialog";
 
 const timeRanges = [
   { label: "24H", value: 1 },
@@ -33,6 +35,7 @@ export default function CoinDetails() {
   const { data: coin, isLoading: coinLoading, error: coinError } = useCoinDetails(coinId || "");
   const { data: chartData, isLoading: chartLoading } = useCoinChart(coinId || "", selectedRange);
   const { watchlist, toggleWatchlist, isInWatchlist } = useWatchlist();
+  const { addAlert } = usePriceAlerts();
 
   const formatPrice = (price: number) => {
     if (price >= 1) return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -142,14 +145,33 @@ export default function CoinDetails() {
                   {copied ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
                 </button>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => toggleWatchlist(coin.id)}
-                className={isInWatchlist(coin.id) ? "text-yellow-500" : "text-muted-foreground"}
-              >
-                <Star className={`w-5 h-5 ${isInWatchlist(coin.id) ? "fill-current" : ""}`} />
-              </Button>
+              <div className="flex items-center gap-1">
+                <PriceAlertDialog
+                  coinId={coin.id}
+                  coinName={coin.name}
+                  coinSymbol={coin.symbol}
+                  coinImage={coin.image.large}
+                  currentPrice={coin.market_data.current_price.usd}
+                  onCreateAlert={addAlert}
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-primary"
+                    >
+                      <Bell className="w-5 h-5" />
+                    </Button>
+                  }
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleWatchlist(coin.id)}
+                  className={isInWatchlist(coin.id) ? "text-yellow-500" : "text-muted-foreground"}
+                >
+                  <Star className={`w-5 h-5 ${isInWatchlist(coin.id) ? "fill-current" : ""}`} />
+                </Button>
+              </div>
             </div>
           )}
         </div>

@@ -11,12 +11,39 @@ import { MarketStatsCards } from "@/components/dashboard/MarketStatsCards";
 import { CoinTable } from "@/components/dashboard/CoinTable";
 import { PriceChart } from "@/components/dashboard/PriceChart";
 import { TrendingCoins } from "@/components/dashboard/TrendingCoins";
+import { PriceAlertsPanel } from "@/components/dashboard/PriceAlertsPanel";
+import { usePriceAlerts } from "@/hooks/usePriceAlerts";
+import { useTopCoins } from "@/hooks/useCryptoData";
 
 const Index = () => {
   const [selectedCoin, setSelectedCoin] = useState({
     id: "bitcoin",
     name: "Bitcoin",
   });
+
+  const { data: coins } = useTopCoins(1, 20);
+  const {
+    alerts,
+    activeAlerts,
+    triggeredAlerts,
+    addAlert,
+    removeAlert,
+    checkAlerts,
+    clearTriggered,
+  } = usePriceAlerts();
+
+  // Create price map for alert checking
+  const currentPrices: Record<string, number> = {};
+  coins?.forEach(coin => {
+    currentPrices[coin.id] = coin.current_price;
+  });
+
+  // Check alerts when prices update
+  useEffect(() => {
+    if (coins && coins.length > 0) {
+      checkAlerts(currentPrices);
+    }
+  }, [coins, checkAlerts]);
 
   // Default to dark mode (Gen Z loves dark mode)
   useEffect(() => {
@@ -101,9 +128,19 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Right Column - Trending */}
+          {/* Right Column - Alerts and Trending */}
           <div className="space-y-4 sm:space-y-6">
             <section className="animate-fade-in" style={{ animationDelay: "150ms" }}>
+              <PriceAlertsPanel
+                alerts={alerts}
+                activeAlerts={activeAlerts}
+                triggeredAlerts={triggeredAlerts}
+                onRemoveAlert={removeAlert}
+                onClearTriggered={clearTriggered}
+                currentPrices={currentPrices}
+              />
+            </section>
+            <section className="animate-fade-in" style={{ animationDelay: "200ms" }}>
               <TrendingCoins onSelectCoin={handleSelectCoin} />
             </section>
           </div>
