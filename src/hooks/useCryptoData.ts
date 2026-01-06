@@ -46,9 +46,10 @@ export function useTopCoins(page: number = 1, perPage: number = 20) {
   return useQuery<CoinMarketData[], Error>({
     queryKey: cryptoKeys.coinsList(page, perPage),
     queryFn: () => fetchTopCoins(page, perPage),
-    staleTime: 30 * 1000, // Consider data stale after 30 seconds
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    retry: 3,
+    staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes (avoid rate limits)
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
 
@@ -59,8 +60,10 @@ export function useGlobalData() {
   return useQuery<GlobalData, Error>({
     queryKey: cryptoKeys.global(),
     queryFn: fetchGlobalData,
-    staleTime: 60 * 1000, // 1 minute
-    refetchInterval: 60 * 1000,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchInterval: 2 * 60 * 1000, // Avoid rate limits
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
 
@@ -84,6 +87,8 @@ export function useTrendingCoins() {
     queryKey: cryptoKeys.trending(),
     queryFn: fetchTrendingCoins,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
 
