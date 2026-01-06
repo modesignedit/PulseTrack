@@ -1,73 +1,111 @@
-# Welcome to your Lovable project
+📈 PulseTrack — Real-Time Data Dashboard
 
-## Project info
+PulseTrack is a modern, mobile-first data dashboard that fetches and visualizes live data from public APIs.
+It’s designed with a strong focus on clean dashboard UX, data clarity, and scalability.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+🚀 Features
 
-## How can I edit this code?
+🌍 Live data fetched from a public API (crypto/finance)
 
-There are several ways of editing your application.
+📊 Interactive charts showing trends over time
 
-**Use Lovable**
+📦 Metric cards for key data points
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+⭐ Watchlist to save favorite assets
 
-Changes made via Lovable will be committed automatically to this repo.
+🔍 Search functionality
 
-**Use your preferred IDE**
+🌗 Dark / Light mode toggle
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+📱 Fully responsive, mobile-first dashboard
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+⚡ Clean, scalable component architecture
 
-Follow these steps:
+🧠 What I Learned
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Fetching and managing external API data
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Designing readable, user-friendly dashboards
 
-# Step 3: Install the necessary dependencies.
-npm i
+Data visualization and chart integration
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Handling loading and error states gracefully
 
-**Edit a file directly in GitHub**
+Structuring scalable UI components
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Thinking in terms of analytics and product UX
 
-**Use GitHub Codespaces**
+🛠️ Built With
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Lovable.dev
 
-## What technologies are used for this project?
+JavaScript
 
-This project is built with:
+HTML & CSS
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Public API integration
 
-## How can I deploy this project?
+Charting & data visualization
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+📸 Screenshots
 
-## Can I connect a custom domain to my Lovable project?
+Add screenshots showing:
 
-Yes, you can!
+Dashboard overview
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Charts and trends
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Mobile view
+
+Dark / Light mode
+
+Watchlist feature
+
+🔗 Live Demo
+
+👉 Add your deployed app link here
+
+📂 How It Works
+
+App fetches live data from a public API
+
+Data is processed and displayed in cards and charts
+
+Users search and track assets
+
+Watchlist persists selected items
+
+Dashboard updates dynamically with new data
+
+UI adapts across devices
+
+🌱 Future Improvements
+
+User authentication and saved dashboards
+
+Advanced analytics and indicators
+
+Notifications for price changes
+
+Historical data comparisons
+
+Exportable reports
+
+👨‍💻 Author
+
+Moses Orji
+Vibe Coder | UI-First Full-Stack Builder
+
+GitHub: https://github.com/modesignedit
+
+LinkedIn: https://ng.linkedin.com/in/moses-orji-5553a8a9
+
+⭐ Why PulseTrack Matters
+
+PulseTrack demonstrates API integration, dashboard UX, and scalable data-driven architecture, making it a strong portfolio project for modern frontend and full-stack roles.
+
+
+
+This project pushed me to think in analytics and product UX, not just components.
+
+#BuildInPublic #Lovable #Das
