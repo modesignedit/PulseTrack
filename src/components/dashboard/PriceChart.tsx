@@ -125,8 +125,9 @@ export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
         )}
 
         {error && (
-          <div className="flex h-[200px] sm:h-[300px] flex-col items-center justify-center text-center">
+          <div className="flex h-[200px] sm:h-[300px] flex-col items-center justify-center text-center gap-2">
             <p className="text-muted-foreground">chart machine broke 😅</p>
+            <p className="text-xs text-muted-foreground/70">API rate limited - try again in a moment</p>
           </div>
         )}
 
