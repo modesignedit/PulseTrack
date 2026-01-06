@@ -245,7 +245,7 @@ export interface ExchangeRates {
  */
 export async function fetchExchangeRates(
   coinId: string,
-  vsCurrencies: string = "usd,eur,gbp,jpy,aud,cad,chf,cny,inr,btc,eth"
+  vsCurrencies: string = "usd,eur,gbp,jpy,aud,cad,chf,cny,inr,btc,eth,mxn,brl,sek,nok,dkk,pln,try,rub,krw,sgd,hkd,thb,idr,php,myr,aed,sar,zar,xau,xag,sats"
 ): Promise<ExchangeRates> {
   const params = new URLSearchParams({
     ids: coinId,
