@@ -29,12 +29,12 @@ function TrendingCoinCard({
   return (
     <button
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-xl p-3 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-0.5"
+      className="flex w-full items-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl p-2 sm:p-3 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-0.5"
     >
       {/* Rank Badge - Gradient for top 3 */}
       <div
         className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
+          "flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full text-xs font-bold flex-shrink-0",
           rank === 1
             ? "gradient-fire text-white shadow-lg"
             : rank === 2
@@ -50,16 +50,16 @@ function TrendingCoinCard({
       <img
         src={image}
         alt={name}
-        className="h-9 w-9 rounded-full ring-2 ring-border/50"
+        className="h-7 w-7 sm:h-9 sm:w-9 rounded-full ring-2 ring-border/50 flex-shrink-0"
         loading="lazy"
       />
 
-      <div className="flex-1 text-left">
-        <div className="font-display font-semibold">{name}</div>
+      <div className="flex-1 text-left min-w-0">
+        <div className="font-display font-semibold text-sm sm:text-base truncate">{name}</div>
         <div className="text-xs uppercase text-muted-foreground">{symbol}</div>
       </div>
 
-      <TrendingUp className="h-4 w-4 text-success" />
+      <TrendingUp className="h-4 w-4 text-success flex-shrink-0" />
     </button>
   );
 }
@@ -82,13 +82,13 @@ export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
 
   return (
     <Card className="glass neon-border overflow-hidden">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 font-display text-lg font-semibold">
-          <Flame className="h-5 w-5 text-warning" />
+      <CardHeader className="p-3 pb-2 sm:p-6 sm:pb-4">
+        <CardTitle className="flex items-center gap-2 font-display text-base sm:text-lg font-semibold">
+          <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
           Trending rn 🔥
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-1 pt-0">
+      <CardContent className="space-y-0.5 sm:space-y-1 p-3 pt-0 sm:p-6 sm:pt-0">
         {isLoading && (
           <>
             {[...Array(7)].map((_, i) => (

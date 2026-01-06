@@ -34,15 +34,15 @@ function StatCard({ title, value, change, icon, gradient, delay = 0 }: StatCardP
       className="glass neon-border overflow-hidden transition-all duration-300 hover:-translate-y-1"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="font-display text-2xl font-bold tracking-tight">{value}</p>
+      <CardContent className="p-3 sm:p-5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 space-y-1 sm:space-y-2 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">{title}</p>
+            <p className="font-display text-lg sm:text-2xl font-bold tracking-tight">{value}</p>
             {change !== undefined && (
               <div
                 className={cn(
-                  "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold",
+                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-bold",
                   isPositive
                     ? "bg-success/20 text-success"
                     : "bg-destructive/20 text-destructive"
@@ -57,7 +57,7 @@ function StatCard({ title, value, change, icon, gradient, delay = 0 }: StatCardP
               </div>
             )}
           </div>
-          <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg", gradient)}>
+          <div className={cn("flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-lg sm:rounded-xl text-white shadow-lg flex-shrink-0", gradient)}>
             {icon}
           </div>
         </div>

@@ -81,20 +81,20 @@ function CoinRow({
       className="group cursor-pointer border-b border-border/30 transition-all hover:bg-primary/5"
       onClick={onSelect}
     >
-      <td className="whitespace-nowrap px-3 py-4 text-sm font-display font-bold text-muted-foreground">
+      <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-xs sm:text-sm font-display font-bold text-muted-foreground">
         {coin.market_cap_rank}
       </td>
 
-      <td className="whitespace-nowrap px-3 py-4">
-        <div className="flex items-center gap-3">
+      <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           <img
             src={coin.image}
             alt={coin.name}
-            className="h-9 w-9 rounded-full ring-2 ring-border/30"
+            className="h-7 w-7 sm:h-9 sm:w-9 rounded-full ring-2 ring-border/30"
             loading="lazy"
           />
-          <div>
-            <div className="font-display font-semibold">{coin.name}</div>
+          <div className="min-w-0">
+            <div className="font-display font-semibold text-sm sm:text-base truncate max-w-[80px] sm:max-w-none">{coin.name}</div>
             <div className="text-xs text-muted-foreground uppercase">
               {coin.symbol}
             </div>
@@ -102,14 +102,14 @@ function CoinRow({
         </div>
       </td>
 
-      <td className="whitespace-nowrap px-3 py-4 text-right font-display font-bold">
+      <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-right font-display font-bold text-sm sm:text-base">
         {formatPrice(coin.current_price)}
       </td>
 
-      <td className="whitespace-nowrap px-3 py-4 text-right">
+      <td className="whitespace-nowrap px-2 sm:px-3 py-3 sm:py-4 text-right">
         <span
           className={cn(
-            "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold",
+            "inline-flex items-center gap-0.5 sm:gap-1 rounded-full px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-bold",
             isPositive
               ? "bg-success/20 text-success"
               : "bg-destructive/20 text-destructive"
@@ -139,11 +139,11 @@ function CoinRow({
         />
       </td>
 
-      <td className="whitespace-nowrap px-3 py-4">
+      <td className="whitespace-nowrap px-1 sm:px-3 py-3 sm:py-4">
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 rounded-full transition-all hover:bg-warning/20"
+          className="h-7 w-7 sm:h-9 sm:w-9 rounded-full transition-all hover:bg-warning/20"
           onClick={(e) => {
             e.stopPropagation();
             onToggleWatchlist();
@@ -151,7 +151,7 @@ function CoinRow({
         >
           <Star
             className={cn(
-              "h-4 w-4 transition-all",
+              "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-all",
               isInWatchlist ? "fill-warning text-warning" : "text-muted-foreground"
             )}
           />
@@ -224,13 +224,13 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
 
     return (
       <Card ref={ref} className="glass neon-border overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between pb-4">
-          <CardTitle className="flex items-center gap-2 font-display text-lg font-semibold">
-            <Sparkles className="h-5 w-5 text-primary" />
+        <CardHeader className="flex flex-row items-center justify-between p-3 pb-3 sm:p-6 sm:pb-4">
+          <CardTitle className="flex items-center gap-2 font-display text-base sm:text-lg font-semibold">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             {showWatchlistOnly ? "Your Faves ⭐" : "Top Coins"}
           </CardTitle>
           {!showWatchlistOnly && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
               <span className="hidden sm:inline">live prices</span>
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
@@ -241,14 +241,14 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
         </CardHeader>
         <CardContent className="overflow-auto p-0">
           {error ? (
-            <div className="p-8 text-center">
+            <div className="p-6 sm:p-8 text-center">
               <p className="text-muted-foreground">bruh, something went wrong 😭</p>
             </div>
           ) : showWatchlistOnly && watchlist.length === 0 ? (
-            <div className="p-8 text-center">
-              <Star className="mx-auto h-12 w-12 text-muted-foreground/30" />
-              <p className="mt-4 text-muted-foreground">no faves yet 🥺</p>
-              <p className="text-sm text-muted-foreground">
+            <div className="p-6 sm:p-8 text-center">
+              <Star className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-muted-foreground/30" />
+              <p className="mt-3 sm:mt-4 text-muted-foreground">no faves yet 🥺</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 tap the star to add some
               </p>
             </div>
@@ -257,7 +257,7 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
               <thead>
                 <tr className="border-b border-border/50 bg-secondary/30 text-xs font-semibold text-muted-foreground">
                   <th
-                    className="cursor-pointer whitespace-nowrap px-3 py-3 text-left"
+                    className="cursor-pointer whitespace-nowrap px-2 sm:px-3 py-2 sm:py-3 text-left"
                     onClick={() => handleSort("rank")}
                   >
                     <div className="flex items-center gap-1">
@@ -267,9 +267,9 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
                       )}
                     </div>
                   </th>
-                  <th className="whitespace-nowrap px-3 py-3 text-left">Name</th>
+                  <th className="whitespace-nowrap px-2 sm:px-3 py-2 sm:py-3 text-left">Name</th>
                   <th
-                    className="cursor-pointer whitespace-nowrap px-3 py-3 text-right"
+                    className="cursor-pointer whitespace-nowrap px-2 sm:px-3 py-2 sm:py-3 text-right"
                     onClick={() => handleSort("price")}
                   >
                     <div className="flex items-center justify-end gap-1">
@@ -280,7 +280,7 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
                     </div>
                   </th>
                   <th
-                    className="cursor-pointer whitespace-nowrap px-3 py-3 text-right"
+                    className="cursor-pointer whitespace-nowrap px-2 sm:px-3 py-2 sm:py-3 text-right"
                     onClick={() => handleSort("change")}
                   >
                     <div className="flex items-center justify-end gap-1">
@@ -293,8 +293,8 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
                   <th className="hidden whitespace-nowrap px-3 py-3 text-right md:table-cell">Market Cap</th>
                   <th className="hidden whitespace-nowrap px-3 py-3 text-right lg:table-cell">Volume</th>
                   <th className="hidden whitespace-nowrap px-3 py-3 text-left md:table-cell">7d Chart</th>
-                  <th className="whitespace-nowrap px-3 py-3 text-left">
-                    <Star className="h-4 w-4" />
+                  <th className="whitespace-nowrap px-1 sm:px-3 py-2 sm:py-3 text-left">
+                    <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </th>
                 </tr>
               </thead>

@@ -42,15 +42,15 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full glass rounded-2xl">
-      <div className="container flex h-16 items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full glass rounded-xl sm:rounded-2xl">
+      <div className="container flex h-14 sm:h-16 items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4">
         {/* Logo with gradient */}
-        <div className="flex items-center gap-3">
-          <div className="gradient-genz flex h-10 w-10 items-center justify-center rounded-xl shadow-lg">
-            <Sparkles className="h-5 w-5 text-white" />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="gradient-genz flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl shadow-lg">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-display text-lg font-bold text-gradient-genz">
+            <span className="font-display text-base sm:text-lg font-bold text-gradient-genz">
               PulseTrack
             </span>
             <span className="hidden text-xs text-muted-foreground sm:block">
