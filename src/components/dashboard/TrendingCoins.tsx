@@ -1,8 +1,7 @@
 /**
- * Trending Coins Component
+ * Trending Coins Component - Gen Z Edition ✨
  * 
- * Displays trending/popular cryptocurrencies
- * based on search popularity on CoinGecko
+ * Shows what's hot rn with fire styling
  */
 
 import { TrendingUp, Flame } from "lucide-react";
@@ -15,7 +14,7 @@ interface TrendingCoinsProps {
 }
 
 /**
- * Single trending coin card
+ * Single trending coin card with gradient rank badges
  */
 function TrendingCoinCard({
   rank,
@@ -33,19 +32,19 @@ function TrendingCoinCard({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 rounded-lg p-3 transition-all hover:bg-muted"
+      className="flex w-full items-center gap-3 rounded-xl p-3 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-0.5"
     >
-      {/* Rank Badge */}
+      {/* Rank Badge with gradient for top 3 */}
       <div
         className={cn(
-          "flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",
+          "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
           rank === 1
-            ? "bg-warning/20 text-warning"
+            ? "gradient-fire text-white shadow-lg"
             : rank === 2
-            ? "bg-muted-foreground/20 text-muted-foreground"
+            ? "gradient-genz text-white"
             : rank === 3
-            ? "bg-warning/10 text-warning"
-            : "bg-muted text-muted-foreground"
+            ? "gradient-mint text-white"
+            : "bg-secondary text-muted-foreground"
         )}
       >
         {rank}
@@ -55,14 +54,14 @@ function TrendingCoinCard({
       <img
         src={image}
         alt={name}
-        className="h-8 w-8 rounded-full"
+        className="h-9 w-9 rounded-full ring-2 ring-border/50"
         loading="lazy"
       />
 
       {/* Coin Info */}
       <div className="flex-1 text-left">
-        <div className="font-medium">{name}</div>
-        <div className="text-xs text-muted-foreground uppercase">{symbol}</div>
+        <div className="font-display font-semibold">{name}</div>
+        <div className="text-xs uppercase text-muted-foreground">{symbol}</div>
       </div>
 
       {/* Trending Icon */}
@@ -77,10 +76,10 @@ function TrendingCoinCard({
 function TrendingCoinSkeleton() {
   return (
     <div className="flex items-center gap-3 p-3">
-      <div className="h-6 w-6 rounded-full bg-muted shimmer" />
-      <div className="h-8 w-8 rounded-full bg-muted shimmer" />
-      <div className="flex-1 space-y-1">
-        <div className="h-4 w-20 rounded bg-muted shimmer" />
+      <div className="h-7 w-7 rounded-full bg-muted shimmer" />
+      <div className="h-9 w-9 rounded-full bg-muted shimmer" />
+      <div className="flex-1 space-y-1.5">
+        <div className="h-4 w-24 rounded bg-muted shimmer" />
         <div className="h-3 w-12 rounded bg-muted shimmer" />
       </div>
     </div>
@@ -91,11 +90,11 @@ export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
   const { data: trendingCoins, isLoading, error } = useTrendingCoins();
 
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+    <Card className="glass neon-border overflow-hidden">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+        <CardTitle className="flex items-center gap-2 font-display text-lg font-semibold">
           <Flame className="h-5 w-5 text-warning" />
-          Trending Now
+          Trending rn 🔥
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-1 pt-0">
@@ -110,9 +109,9 @@ export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
 
         {/* Error State */}
         {error && (
-          <div className="py-4 text-center">
+          <div className="py-6 text-center">
             <p className="text-sm text-muted-foreground">
-              Failed to load trending coins
+              couldn't load trending 😅
             </p>
           </div>
         )}
