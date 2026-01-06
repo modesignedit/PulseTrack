@@ -2,13 +2,15 @@
  * Currency Converter - Real-time crypto conversions ✨
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -17,32 +19,84 @@ import { ArrowDownUp, Copy, Check, RefreshCw } from "lucide-react";
 import { useExchangeRates } from "@/hooks/useCryptoData";
 import { cn } from "@/lib/utils";
 
-// Supported currencies with display info
+// Supported crypto currencies
 const CRYPTO_CURRENCIES = [
-  { id: "bitcoin", symbol: "BTC", name: "Bitcoin" },
-  { id: "ethereum", symbol: "ETH", name: "Ethereum" },
-  { id: "solana", symbol: "SOL", name: "Solana" },
-  { id: "ripple", symbol: "XRP", name: "XRP" },
-  { id: "dogecoin", symbol: "DOGE", name: "Dogecoin" },
-] as const;
+  { id: "bitcoin", symbol: "BTC", name: "Bitcoin", icon: "₿" },
+  { id: "ethereum", symbol: "ETH", name: "Ethereum", icon: "Ξ" },
+  { id: "binancecoin", symbol: "BNB", name: "BNB", icon: "⬡" },
+  { id: "solana", symbol: "SOL", name: "Solana", icon: "◎" },
+  { id: "ripple", symbol: "XRP", name: "XRP", icon: "✕" },
+  { id: "cardano", symbol: "ADA", name: "Cardano", icon: "₳" },
+  { id: "avalanche-2", symbol: "AVAX", name: "Avalanche", icon: "🔺" },
+  { id: "polkadot", symbol: "DOT", name: "Polkadot", icon: "●" },
+  { id: "chainlink", symbol: "LINK", name: "Chainlink", icon: "⬡" },
+  { id: "matic-network", symbol: "MATIC", name: "Polygon", icon: "⬡" },
+  { id: "litecoin", symbol: "LTC", name: "Litecoin", icon: "Ł" },
+  { id: "dogecoin", symbol: "DOGE", name: "Dogecoin", icon: "Ð" },
+  { id: "shiba-inu", symbol: "SHIB", name: "Shiba Inu", icon: "🐕" },
+  { id: "tron", symbol: "TRX", name: "Tron", icon: "◈" },
+  { id: "uniswap", symbol: "UNI", name: "Uniswap", icon: "🦄" },
+];
 
+// Supported fiat and other currencies grouped by region
 const FIAT_CURRENCIES = [
-  { id: "usd", symbol: "USD", name: "US Dollar" },
-  { id: "eur", symbol: "EUR", name: "Euro" },
-  { id: "gbp", symbol: "GBP", name: "British Pound" },
-  { id: "jpy", symbol: "JPY", name: "Japanese Yen" },
-  { id: "aud", symbol: "AUD", name: "Australian Dollar" },
-  { id: "cad", symbol: "CAD", name: "Canadian Dollar" },
-  { id: "inr", symbol: "INR", name: "Indian Rupee" },
-] as const;
+  // Americas
+  { id: "usd", symbol: "USD", name: "US Dollar", icon: "$", region: "Americas" },
+  { id: "cad", symbol: "CAD", name: "Canadian Dollar", icon: "C$", region: "Americas" },
+  { id: "mxn", symbol: "MXN", name: "Mexican Peso", icon: "MX$", region: "Americas" },
+  { id: "brl", symbol: "BRL", name: "Brazilian Real", icon: "R$", region: "Americas" },
+  // Europe
+  { id: "eur", symbol: "EUR", name: "Euro", icon: "€", region: "Europe" },
+  { id: "gbp", symbol: "GBP", name: "British Pound", icon: "£", region: "Europe" },
+  { id: "chf", symbol: "CHF", name: "Swiss Franc", icon: "Fr", region: "Europe" },
+  { id: "sek", symbol: "SEK", name: "Swedish Krona", icon: "kr", region: "Europe" },
+  { id: "nok", symbol: "NOK", name: "Norwegian Krone", icon: "kr", region: "Europe" },
+  { id: "dkk", symbol: "DKK", name: "Danish Krone", icon: "kr", region: "Europe" },
+  { id: "pln", symbol: "PLN", name: "Polish Zloty", icon: "zł", region: "Europe" },
+  { id: "try", symbol: "TRY", name: "Turkish Lira", icon: "₺", region: "Europe" },
+  { id: "rub", symbol: "RUB", name: "Russian Ruble", icon: "₽", region: "Europe" },
+  // Asia-Pacific
+  { id: "jpy", symbol: "JPY", name: "Japanese Yen", icon: "¥", region: "Asia-Pacific" },
+  { id: "cny", symbol: "CNY", name: "Chinese Yuan", icon: "¥", region: "Asia-Pacific" },
+  { id: "krw", symbol: "KRW", name: "South Korean Won", icon: "₩", region: "Asia-Pacific" },
+  { id: "inr", symbol: "INR", name: "Indian Rupee", icon: "₹", region: "Asia-Pacific" },
+  { id: "aud", symbol: "AUD", name: "Australian Dollar", icon: "A$", region: "Asia-Pacific" },
+  { id: "sgd", symbol: "SGD", name: "Singapore Dollar", icon: "S$", region: "Asia-Pacific" },
+  { id: "hkd", symbol: "HKD", name: "Hong Kong Dollar", icon: "HK$", region: "Asia-Pacific" },
+  { id: "thb", symbol: "THB", name: "Thai Baht", icon: "฿", region: "Asia-Pacific" },
+  { id: "idr", symbol: "IDR", name: "Indonesian Rupiah", icon: "Rp", region: "Asia-Pacific" },
+  { id: "php", symbol: "PHP", name: "Philippine Peso", icon: "₱", region: "Asia-Pacific" },
+  { id: "myr", symbol: "MYR", name: "Malaysian Ringgit", icon: "RM", region: "Asia-Pacific" },
+  // Middle East & Africa
+  { id: "aed", symbol: "AED", name: "UAE Dirham", icon: "د.إ", region: "Middle East" },
+  { id: "sar", symbol: "SAR", name: "Saudi Riyal", icon: "﷼", region: "Middle East" },
+  { id: "zar", symbol: "ZAR", name: "South African Rand", icon: "R", region: "Africa" },
+  // Commodities & Crypto
+  { id: "xau", symbol: "XAU", name: "Gold (oz)", icon: "🥇", region: "Commodities" },
+  { id: "xag", symbol: "XAG", name: "Silver (oz)", icon: "🥈", region: "Commodities" },
+  { id: "sats", symbol: "SATS", name: "Satoshis", icon: "⚡", region: "Crypto" },
+];
 
 // Quick conversion pairs
 const QUICK_PAIRS = [
   { from: "bitcoin", to: "usd", label: "BTC/USD" },
   { from: "ethereum", to: "usd", label: "ETH/USD" },
-  { from: "bitcoin", to: "eth", label: "BTC/ETH" },
+  { from: "bitcoin", to: "eur", label: "BTC/EUR" },
+  { from: "ethereum", to: "eur", label: "ETH/EUR" },
+  { from: "binancecoin", to: "usd", label: "BNB/USD" },
   { from: "solana", to: "usd", label: "SOL/USD" },
+  { from: "cardano", to: "usd", label: "ADA/USD" },
+  { from: "bitcoin", to: "xau", label: "BTC/Gold" },
 ];
+
+// Group currencies by region
+const groupedFiatCurrencies = FIAT_CURRENCIES.reduce((acc, currency) => {
+  if (!acc[currency.region]) {
+    acc[currency.region] = [];
+  }
+  acc[currency.region].push(currency);
+  return acc;
+}, {} as Record<string, typeof FIAT_CURRENCIES>);
 
 export function CurrencyConverter() {
   const [amount, setAmount] = useState("1");
@@ -69,7 +123,6 @@ export function CurrencyConverter() {
   const formattedResult = useMemo(() => {
     if (result === null) return "—";
     
-    // Format based on size
     if (result >= 1000000) {
       return result.toLocaleString(undefined, { maximumFractionDigits: 0 });
     } else if (result >= 1) {
@@ -82,8 +135,6 @@ export function CurrencyConverter() {
   // Handle swap currencies
   const handleSwap = () => {
     setIsSwapping(true);
-    
-    // Check if we can swap (toCurrency must be a valid crypto for rates)
     const isToCrypto = CRYPTO_CURRENCIES.some(c => c.id === toCurrency);
     
     if (isToCrypto) {
@@ -182,18 +233,21 @@ export function CurrencyConverter() {
               <SelectTrigger className="h-10 sm:h-12 bg-secondary/30 border-border/50">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
-                <div className="px-2 py-1.5 text-[10px] sm:text-xs text-muted-foreground uppercase">
-                  Crypto
-                </div>
-                {CRYPTO_CURRENCIES.map((currency) => (
-                  <SelectItem key={currency.id} value={currency.id}>
-                    <span className="font-medium">{currency.symbol}</span>
-                    <span className="ml-2 text-muted-foreground text-xs hidden sm:inline">
-                      {currency.name}
-                    </span>
-                  </SelectItem>
-                ))}
+              <SelectContent className="bg-popover border-border max-h-[300px]">
+                <SelectGroup>
+                  <SelectLabel className="text-[10px] sm:text-xs text-muted-foreground">
+                    Cryptocurrencies
+                  </SelectLabel>
+                  {CRYPTO_CURRENCIES.map((currency) => (
+                    <SelectItem key={currency.id} value={currency.id}>
+                      <span className="mr-2">{currency.icon}</span>
+                      <span className="font-medium">{currency.symbol}</span>
+                      <span className="ml-2 text-muted-foreground text-xs hidden sm:inline">
+                        {currency.name}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
@@ -222,26 +276,34 @@ export function CurrencyConverter() {
               <SelectTrigger className="h-10 sm:h-12 bg-secondary/30 border-border/50">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-popover border-border">
-                <div className="px-2 py-1.5 text-[10px] sm:text-xs text-muted-foreground uppercase">
-                  Fiat
-                </div>
-                {FIAT_CURRENCIES.map((currency) => (
-                  <SelectItem key={currency.id} value={currency.id}>
-                    <span className="font-medium">{currency.symbol}</span>
-                    <span className="ml-2 text-muted-foreground text-xs hidden sm:inline">
-                      {currency.name}
-                    </span>
-                  </SelectItem>
+              <SelectContent className="bg-popover border-border max-h-[300px]">
+                {Object.entries(groupedFiatCurrencies).map(([region, currencies]) => (
+                  <SelectGroup key={region}>
+                    <SelectLabel className="text-[10px] sm:text-xs text-muted-foreground">
+                      {region}
+                    </SelectLabel>
+                    {currencies.map((currency) => (
+                      <SelectItem key={currency.id} value={currency.id}>
+                        <span className="mr-2">{currency.icon}</span>
+                        <span className="font-medium">{currency.symbol}</span>
+                        <span className="ml-2 text-muted-foreground text-xs hidden sm:inline">
+                          {currency.name}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 ))}
-                <div className="px-2 py-1.5 text-[10px] sm:text-xs text-muted-foreground uppercase mt-2">
-                  Crypto
-                </div>
-                {CRYPTO_CURRENCIES.filter(c => c.id !== fromCurrency).map((currency) => (
-                  <SelectItem key={currency.id} value={currency.id.slice(0, 3)}>
-                    <span className="font-medium">{currency.symbol}</span>
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  <SelectLabel className="text-[10px] sm:text-xs text-muted-foreground">
+                    Crypto
+                  </SelectLabel>
+                  {CRYPTO_CURRENCIES.filter(c => c.id !== fromCurrency).map((currency) => (
+                    <SelectItem key={currency.id} value={currency.id.slice(0, 3)}>
+                      <span className="mr-2">{currency.icon}</span>
+                      <span className="font-medium">{currency.symbol}</span>
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
