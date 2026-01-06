@@ -12,6 +12,7 @@ import { CoinTable } from "@/components/dashboard/CoinTable";
 import { PriceChart } from "@/components/dashboard/PriceChart";
 import { TrendingCoins } from "@/components/dashboard/TrendingCoins";
 import { PriceAlertsPanel } from "@/components/dashboard/PriceAlertsPanel";
+import { NewsFeed } from "@/components/dashboard/NewsFeed";
 import { usePriceAlerts } from "@/hooks/usePriceAlerts";
 import { useTopCoins } from "@/hooks/useCryptoData";
 
@@ -142,6 +143,9 @@ const Index = () => {
             </section>
             <section className="animate-fade-in" style={{ animationDelay: "200ms" }}>
               <TrendingCoins onSelectCoin={handleSelectCoin} />
+            </section>
+            <section className="animate-fade-in" style={{ animationDelay: "250ms" }}>
+              <NewsFeed />
             </section>
           </div>
         </div>
