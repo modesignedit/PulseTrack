@@ -1,7 +1,7 @@
 /**
  * Trending Coins Component - Gen Z Edition ✨
  * 
- * Shows what's hot rn with fire styling
+ * Shows what's hot rn with gradient badges
  */
 
 import { TrendingUp, Flame } from "lucide-react";
@@ -13,9 +13,6 @@ interface TrendingCoinsProps {
   onSelectCoin?: (coinId: string) => void;
 }
 
-/**
- * Single trending coin card with gradient rank badges
- */
 function TrendingCoinCard({
   rank,
   name,
@@ -34,7 +31,7 @@ function TrendingCoinCard({
       onClick={onClick}
       className="flex w-full items-center gap-3 rounded-xl p-3 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-0.5"
     >
-      {/* Rank Badge with gradient for top 3 */}
+      {/* Rank Badge - Gradient for top 3 */}
       <div
         className={cn(
           "flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold",
@@ -50,7 +47,6 @@ function TrendingCoinCard({
         {rank}
       </div>
 
-      {/* Coin Image */}
       <img
         src={image}
         alt={name}
@@ -58,21 +54,16 @@ function TrendingCoinCard({
         loading="lazy"
       />
 
-      {/* Coin Info */}
       <div className="flex-1 text-left">
         <div className="font-display font-semibold">{name}</div>
         <div className="text-xs uppercase text-muted-foreground">{symbol}</div>
       </div>
 
-      {/* Trending Icon */}
       <TrendingUp className="h-4 w-4 text-success" />
     </button>
   );
 }
 
-/**
- * Loading skeleton
- */
 function TrendingCoinSkeleton() {
   return (
     <div className="flex items-center gap-3 p-3">
@@ -98,7 +89,6 @@ export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-1 pt-0">
-        {/* Loading State */}
         {isLoading && (
           <>
             {[...Array(7)].map((_, i) => (
@@ -107,7 +97,6 @@ export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
           </>
         )}
 
-        {/* Error State */}
         {error && (
           <div className="py-6 text-center">
             <p className="text-sm text-muted-foreground">
@@ -116,7 +105,6 @@ export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
           </div>
         )}
 
-        {/* Trending Coins List */}
         {!isLoading &&
           !error &&
           trendingCoins?.slice(0, 7).map((coin, index) => (

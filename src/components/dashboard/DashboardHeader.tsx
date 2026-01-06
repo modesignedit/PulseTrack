@@ -1,14 +1,10 @@
 /**
- * Dashboard Header Component
+ * Dashboard Header Component - Gen Z Edition ✨
  * 
- * Top navigation bar with:
- * - Logo and branding
- * - Search functionality
- * - Theme toggle
- * - Live indicator
+ * Top navigation with gradient logo, glassy search, and neon vibes
  */
 
-import { Moon, Sun, Activity, Search, X } from "lucide-react";
+import { Moon, Sun, Sparkles, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTheme } from "@/hooks/useTheme";
@@ -26,10 +22,8 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   
-  // Fetch search results
   const { data: searchResults, isLoading: isSearching } = useSearchCoins(searchQuery);
 
-  // Close search dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -48,28 +42,30 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 w-full glass rounded-2xl">
       <div className="container flex h-16 items-center justify-between gap-4">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <Activity className="h-5 w-5 text-primary-foreground" />
+        {/* Logo with gradient */}
+        <div className="flex items-center gap-3">
+          <div className="gradient-genz flex h-10 w-10 items-center justify-center rounded-xl shadow-lg">
+            <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold tracking-tight">PulseTrack</span>
+            <span className="font-display text-lg font-bold text-gradient-genz">
+              PulseTrack
+            </span>
             <span className="hidden text-xs text-muted-foreground sm:block">
-              Crypto Dashboard
+              your crypto bestie ✨
             </span>
           </div>
         </div>
 
         {/* Search - Desktop */}
         <div ref={searchRef} className="relative hidden w-full max-w-md md:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search cryptocurrencies..."
-            className="w-full pl-9 pr-4"
+            placeholder="search coins..."
+            className="w-full rounded-full border-2 border-transparent bg-secondary/50 pl-11 pr-4 transition-all focus:border-primary focus:shadow-[0_0_20px_hsl(270_91%_65%/0.3)]"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -80,7 +76,7 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
           
           {/* Search Results Dropdown */}
           {isSearchOpen && searchQuery.length >= 2 && (
-            <div className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-auto rounded-lg border border-border bg-card p-2 shadow-lg animate-fade-in">
+            <div className="absolute top-full left-0 right-0 mt-2 max-h-80 overflow-auto rounded-2xl glass p-2 shadow-xl animate-fade-in">
               {isSearching ? (
                 <div className="flex items-center justify-center py-4">
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -91,21 +87,21 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
                     <li key={coin.id}>
                       <button
                         onClick={() => handleSelectResult(coin)}
-                        className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-muted"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all hover:bg-primary/10"
                       >
                         <img
                           src={coin.thumb}
                           alt={coin.name}
-                          className="h-6 w-6 rounded-full"
+                          className="h-7 w-7 rounded-full"
                         />
                         <div className="flex-1 truncate">
-                          <span className="font-medium">{coin.name}</span>
-                          <span className="ml-2 text-muted-foreground uppercase">
+                          <span className="font-display font-medium">{coin.name}</span>
+                          <span className="ml-2 text-muted-foreground uppercase text-sm">
                             {coin.symbol}
                           </span>
                         </div>
                         {coin.market_cap_rank && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
                             #{coin.market_cap_rank}
                           </span>
                         )}
@@ -115,7 +111,7 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
                 </ul>
               ) : (
                 <p className="py-4 text-center text-muted-foreground">
-                  No results found
+                  no coins found 😅
                 </p>
               )}
             </div>
@@ -128,7 +124,7 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden rounded-full"
             onClick={() => setIsSearchOpen(!isSearchOpen)}
           >
             {isSearchOpen ? (
@@ -139,12 +135,12 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
           </Button>
 
           {/* Live Indicator */}
-          <div className="hidden items-center gap-2 rounded-full bg-success/10 px-3 py-1.5 sm:flex">
+          <div className="hidden items-center gap-2 rounded-full bg-success/20 px-3 py-1.5 sm:flex">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
             </span>
-            <span className="text-xs font-medium text-success">Live</span>
+            <span className="text-xs font-bold text-success">vibing 🔥</span>
           </div>
 
           {/* Theme Toggle */}
@@ -152,12 +148,12 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="transition-smooth hover:bg-muted"
+            className="rounded-full bg-secondary/50 hover:bg-secondary transition-all"
           >
             {theme === "dark" ? (
-              <Sun className="h-5 w-5" />
+              <Sun className="h-5 w-5 text-warning" />
             ) : (
-              <Moon className="h-5 w-5" />
+              <Moon className="h-5 w-5 text-primary" />
             )}
             <span className="sr-only">Toggle theme</span>
           </Button>
@@ -166,22 +162,21 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
 
       {/* Mobile Search Bar */}
       {isSearchOpen && (
-        <div className="border-t border-border p-4 md:hidden">
+        <div className="border-t border-border/50 p-4 md:hidden">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search cryptocurrencies..."
-              className="w-full pl-9"
+              placeholder="search coins..."
+              className="w-full rounded-full pl-11"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
             />
           </div>
           
-          {/* Mobile Search Results */}
           {searchQuery.length >= 2 && (
-            <div className="mt-2 max-h-60 overflow-auto">
+            <div className="mt-3 max-h-60 overflow-auto">
               {isSearching ? (
                 <div className="flex items-center justify-center py-4">
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -192,15 +187,15 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
                     <li key={coin.id}>
                       <button
                         onClick={() => handleSelectResult(coin)}
-                        className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-muted"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors hover:bg-primary/10"
                       >
                         <img
                           src={coin.thumb}
                           alt={coin.name}
                           className="h-6 w-6 rounded-full"
                         />
-                        <span className="font-medium">{coin.name}</span>
-                        <span className="text-muted-foreground uppercase">
+                        <span className="font-display font-medium">{coin.name}</span>
+                        <span className="text-muted-foreground uppercase text-sm">
                           {coin.symbol}
                         </span>
                       </button>
@@ -209,7 +204,7 @@ export function DashboardHeader({ onSelectCoin }: DashboardHeaderProps) {
                 </ul>
               ) : (
                 <p className="py-4 text-center text-muted-foreground">
-                  No results found
+                  no coins found 😅
                 </p>
               )}
             </div>
