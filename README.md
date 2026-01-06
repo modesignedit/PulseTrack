@@ -108,4 +108,4 @@ PulseTrack demonstrates API integration, dashboard UX, and scalable data-driven 
 
 This project pushed me to think in analytics and product UX, not just components.
 
-#BuildInPublic #Lovable #Das
+#BuildInPublic #Lovable #Dashboard #DataViz #FullStack #VibeCoder
