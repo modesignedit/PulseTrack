@@ -12,6 +12,7 @@ import { useWatchlist } from "@/hooks/useWatchlist";
 import { cn } from "@/lib/utils";
 import type { CoinMarketData } from "@/services/cryptoApi";
 import { useState, forwardRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface CoinTableProps {
   onSelectCoin?: (coinId: string) => void;
@@ -186,10 +187,19 @@ function CoinRowSkeleton() {
 
 export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
   function CoinTable({ onSelectCoin, showWatchlistOnly = false }, ref) {
+    const navigate = useNavigate();
     const { data: coins, isLoading, error } = useTopCoins(1, 20);
     const { isInWatchlist, toggleWatchlist, watchlist } = useWatchlist();
     const [sortBy, setSortBy] = useState<"rank" | "price" | "change">("rank");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    
+    const handleSelectCoin = (coinId: string) => {
+      if (onSelectCoin) {
+        onSelectCoin(coinId);
+      } else {
+        navigate(`/coin/${coinId}`);
+      }
+    };
 
     const filteredCoins = coins
       ? showWatchlistOnly
@@ -308,7 +318,7 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
                       coin={coin}
                       isInWatchlist={isInWatchlist(coin.id)}
                       onToggleWatchlist={() => toggleWatchlist(coin.id)}
-                      onSelect={() => onSelectCoin?.(coin.id)}
+                      onSelect={() => handleSelectCoin(coin.id)}
                     />
                   ))
                 )}
