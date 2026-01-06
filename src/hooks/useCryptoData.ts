@@ -14,7 +14,9 @@ import {
   fetchCoinChart,
   fetchTrendingCoins,
   searchCoins,
+  fetchCoinDetails,
   type CoinMarketData,
+  type CoinDetails,
   type GlobalData,
   type ChartData,
   type TrendingCoin,
@@ -93,5 +95,17 @@ export function useSearchCoins(query: string) {
     queryFn: () => searchCoins(query),
     enabled: query.length >= 2, // Only search with 2+ characters
     staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+/**
+ * Hook to fetch detailed coin information
+ */
+export function useCoinDetails(coinId: string) {
+  return useQuery<CoinDetails, Error>({
+    queryKey: [...cryptoKeys.all, "details", coinId] as const,
+    queryFn: () => fetchCoinDetails(coinId),
+    enabled: !!coinId,
+    staleTime: 60 * 1000, // 1 minute
   });
 }

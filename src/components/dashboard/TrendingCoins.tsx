@@ -8,6 +8,7 @@ import { TrendingUp, Flame } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTrendingCoins } from "@/hooks/useCryptoData";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface TrendingCoinsProps {
   onSelectCoin?: (coinId: string) => void;
@@ -78,7 +79,16 @@ function TrendingCoinSkeleton() {
 }
 
 export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
+  const navigate = useNavigate();
   const { data: trendingCoins, isLoading, error } = useTrendingCoins();
+  
+  const handleSelectCoin = (coinId: string) => {
+    if (onSelectCoin) {
+      onSelectCoin(coinId);
+    } else {
+      navigate(`/coin/${coinId}`);
+    }
+  };
 
   return (
     <Card className="glass neon-border overflow-hidden">
@@ -114,7 +124,7 @@ export function TrendingCoins({ onSelectCoin }: TrendingCoinsProps) {
               name={coin.item.name}
               symbol={coin.item.symbol}
               image={coin.item.small}
-              onClick={() => onSelectCoin?.(coin.item.id)}
+              onClick={() => handleSelectCoin(coin.item.id)}
             />
           ))}
       </CardContent>
