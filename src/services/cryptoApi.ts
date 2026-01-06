@@ -232,3 +232,32 @@ export async function fetchCoinDetails(coinId: string): Promise<CoinDetails> {
 
   return response.json();
 }
+
+// Exchange rate types
+export interface ExchangeRates {
+  [currency: string]: number;
+}
+
+/**
+ * Fetch exchange rates for a coin in multiple currencies
+ * @param coinId - The coin ID (e.g., "bitcoin")
+ * @param vsCurrencies - Comma-separated list of currencies
+ */
+export async function fetchExchangeRates(
+  coinId: string,
+  vsCurrencies: string = "usd,eur,gbp,jpy,aud,cad,chf,cny,inr,btc,eth"
+): Promise<ExchangeRates> {
+  const params = new URLSearchParams({
+    ids: coinId,
+    vs_currencies: vsCurrencies,
+  });
+
+  const response = await fetch(`${BASE_URL}/simple/price?${params}`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch exchange rates: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data[coinId] || {};
+}

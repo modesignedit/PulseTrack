@@ -13,6 +13,7 @@ import { PriceChart } from "@/components/dashboard/PriceChart";
 import { TrendingCoins } from "@/components/dashboard/TrendingCoins";
 import { PriceAlertsPanel } from "@/components/dashboard/PriceAlertsPanel";
 import { NewsFeed } from "@/components/dashboard/NewsFeed";
+import { CurrencyConverter } from "@/components/dashboard/CurrencyConverter";
 import { usePriceAlerts } from "@/hooks/usePriceAlerts";
 import { useTopCoins } from "@/hooks/useCryptoData";
 
@@ -129,7 +130,7 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Right Column - Alerts and Trending */}
+          {/* Right Column - Alerts, Converter, and Trending */}
           <div className="space-y-4 sm:space-y-6">
             <section className="animate-fade-in" style={{ animationDelay: "150ms" }}>
               <PriceAlertsPanel
@@ -140,6 +141,9 @@ const Index = () => {
                 onClearTriggered={clearTriggered}
                 currentPrices={currentPrices}
               />
+            </section>
+            <section className="animate-fade-in" style={{ animationDelay: "175ms" }}>
+              <CurrencyConverter />
             </section>
             <section className="animate-fade-in" style={{ animationDelay: "200ms" }}>
               <TrendingCoins onSelectCoin={handleSelectCoin} />
