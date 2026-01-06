@@ -46,45 +46,45 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Gradient Background Orbs */}
+      {/* Gradient Background Orbs - Smaller on mobile */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
-        <div className="absolute -bottom-40 left-1/3 h-80 w-80 rounded-full bg-success/10 blur-3xl" />
+        <div className="absolute -left-20 -top-20 h-40 w-40 rounded-full bg-primary/20 blur-3xl sm:-left-40 sm:-top-40 sm:h-80 sm:w-80" />
+        <div className="absolute -right-20 top-1/3 h-48 w-48 rounded-full bg-accent/20 blur-3xl sm:-right-40 sm:h-96 sm:w-96" />
+        <div className="absolute -bottom-20 left-1/4 h-40 w-40 rounded-full bg-success/10 blur-3xl sm:-bottom-40 sm:left-1/3 sm:h-80 sm:w-80" />
       </div>
 
       {/* Header */}
-      <div className="relative">
+      <div className="relative px-3 pt-3 sm:px-0 sm:pt-0">
         <DashboardHeader onSelectCoin={handleSelectCoin} />
       </div>
 
       {/* Main Content */}
-      <main className="container relative py-6 space-y-6">
+      <main className="container relative px-3 py-4 space-y-4 sm:px-4 sm:py-6 sm:space-y-6">
         {/* Market Statistics Cards */}
         <section className="animate-fade-in">
           <MarketStatsCards />
         </section>
 
         {/* Main Dashboard Grid */}
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-3">
           {/* Left Column - Chart and Table */}
-          <div className="space-y-6 lg:col-span-2">
+          <div className="space-y-4 sm:space-y-6 lg:col-span-2">
             <section className="animate-fade-in" style={{ animationDelay: "100ms" }}>
               <PriceChart coinId={selectedCoin.id} coinName={selectedCoin.name} />
             </section>
 
             <section className="animate-fade-in" style={{ animationDelay: "200ms" }}>
               <Tabs defaultValue="all" className="w-full">
-                <TabsList className="mb-4 w-full justify-start rounded-full bg-secondary/50 p-1">
+                <TabsList className="mb-3 sm:mb-4 w-full justify-start rounded-full bg-secondary/50 p-1">
                   <TabsTrigger 
                     value="all" 
-                    className="flex-1 rounded-full data-[state=active]:gradient-genz data-[state=active]:text-white sm:flex-none"
+                    className="flex-1 rounded-full text-xs sm:text-sm data-[state=active]:gradient-genz data-[state=active]:text-white sm:flex-none"
                   >
                     All Coins
                   </TabsTrigger>
                   <TabsTrigger 
                     value="watchlist" 
-                    className="flex-1 rounded-full data-[state=active]:gradient-genz data-[state=active]:text-white sm:flex-none"
+                    className="flex-1 rounded-full text-xs sm:text-sm data-[state=active]:gradient-genz data-[state=active]:text-white sm:flex-none"
                   >
                     Watchlist ⭐
                   </TabsTrigger>
@@ -102,7 +102,7 @@ const Index = () => {
           </div>
 
           {/* Right Column - Trending */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <section className="animate-fade-in" style={{ animationDelay: "150ms" }}>
               <TrendingCoins onSelectCoin={handleSelectCoin} />
             </section>
@@ -110,8 +110,8 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-border/30 pt-8 pb-4 text-center">
-          <p className="text-sm text-muted-foreground">
+        <footer className="border-t border-border/30 pt-6 pb-4 sm:pt-8 text-center">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             made with 💜 by{" "}
             <span className="font-display font-bold text-gradient-genz">
               PulseTrack

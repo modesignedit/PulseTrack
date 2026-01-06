@@ -87,24 +87,24 @@ export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
 
   return (
     <Card className="glass neon-border overflow-hidden">
-      <CardHeader className="flex flex-col gap-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <CardTitle className="flex items-center gap-2 font-display text-lg font-semibold">
-          <TrendingUp className="h-5 w-5 text-primary" />
+      <CardHeader className="flex flex-col gap-3 p-3 pb-3 sm:p-6 sm:pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <CardTitle className="flex flex-wrap items-center gap-2 font-display text-base sm:text-lg font-semibold">
+          <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           {coinName} Chart
-          <span className="text-sm font-normal text-muted-foreground">
+          <span className="text-xs sm:text-sm font-normal text-muted-foreground">
             {isPositive ? "📈 going up" : "📉 going down"}
           </span>
         </CardTitle>
 
         {/* Time Range Selector */}
-        <div className="flex gap-1 rounded-full bg-secondary/50 p-1">
+        <div className="flex gap-0.5 sm:gap-1 rounded-full bg-secondary/50 p-0.5 sm:p-1 w-full sm:w-auto">
           {timeRanges.map((range) => (
             <Button
               key={range.value}
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 rounded-full px-4 text-xs font-semibold transition-all",
+                "h-7 sm:h-8 rounded-full px-2 sm:px-4 text-xs font-semibold transition-all flex-1 sm:flex-none",
                 selectedRange === range.value
                   ? "gradient-genz text-white shadow-lg"
                   : "text-muted-foreground hover:text-foreground"
@@ -117,21 +117,21 @@ export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="p-3 pt-0 sm:p-6 sm:pt-0">
         {isLoading && (
-          <div className="flex h-[300px] items-center justify-center">
+          <div className="flex h-[200px] sm:h-[300px] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           </div>
         )}
 
         {error && (
-          <div className="flex h-[300px] flex-col items-center justify-center text-center">
+          <div className="flex h-[200px] sm:h-[300px] flex-col items-center justify-center text-center">
             <p className="text-muted-foreground">chart machine broke 😅</p>
           </div>
         )}
 
         {!isLoading && !error && sampledData.length > 0 && (
-          <div className="h-[300px] w-full">
+          <div className="h-[200px] sm:h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={sampledData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
