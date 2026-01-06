@@ -15,12 +15,14 @@ import {
   fetchTrendingCoins,
   searchCoins,
   fetchCoinDetails,
+  fetchExchangeRates,
   type CoinMarketData,
   type CoinDetails,
   type GlobalData,
   type ChartData,
   type TrendingCoin,
   type SearchResult,
+  type ExchangeRates,
 } from "@/services/cryptoApi";
 
 // Query key factory for consistent cache keys
@@ -107,5 +109,17 @@ export function useCoinDetails(coinId: string) {
     queryFn: () => fetchCoinDetails(coinId),
     enabled: !!coinId,
     staleTime: 60 * 1000, // 1 minute
+  });
+}
+
+/**
+ * Hook to fetch exchange rates for a coin
+ */
+export function useExchangeRates(coinId: string) {
+  return useQuery<ExchangeRates, Error>({
+    queryKey: [...cryptoKeys.all, "rates", coinId] as const,
+    queryFn: () => fetchExchangeRates(coinId),
+    enabled: !!coinId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
