@@ -1,14 +1,11 @@
 /**
- * Price Chart Component
+ * Price Chart Component - Gen Z Edition ✨
  * 
- * Interactive line chart showing price trends over time
- * Uses Recharts for beautiful, responsive charts
+ * Interactive chart with gradient lines and neon styling
  */
 
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -20,13 +17,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCoinChart } from "@/hooks/useCryptoData";
 import { cn } from "@/lib/utils";
+import { TrendingUp } from "lucide-react";
 
 interface PriceChartProps {
   coinId: string;
   coinName?: string;
 }
 
-// Time range options
 const timeRanges = [
   { label: "24H", value: 1 },
   { label: "7D", value: 7 },
@@ -35,9 +32,6 @@ const timeRanges = [
   { label: "1Y", value: 365 },
 ] as const;
 
-/**
- * Format timestamp to readable date/time
- */
 function formatDate(timestamp: number, days: number): string {
   const date = new Date(timestamp);
   if (days <= 1) {
@@ -49,9 +43,6 @@ function formatDate(timestamp: number, days: number): string {
   return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
-/**
- * Format price for display
- */
 function formatPrice(price: number): string {
   if (price >= 1000) return `$${price.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   if (price >= 1) return `$${price.toFixed(2)}`;
@@ -59,61 +50,63 @@ function formatPrice(price: number): string {
 }
 
 /**
- * Custom tooltip component
+ * Custom tooltip - using forwardRef to avoid React warning
  */
-function CustomTooltip({ active, payload, label }: any) {
+const CustomTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, label }, ref) => {
   if (!active || !payload || !payload.length) return null;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-3 shadow-lg">
-      <p className="text-sm text-muted-foreground">{label}</p>
-      <p className="text-lg font-bold">{formatPrice(payload[0].value)}</p>
+    <div ref={ref} className="glass rounded-xl px-4 py-3 shadow-xl glow">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="font-display text-lg font-bold text-primary">{formatPrice(payload[0].value)}</p>
     </div>
   );
-}
+});
+CustomTooltip.displayName = "CustomTooltip";
 
 export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
   const [selectedRange, setSelectedRange] = useState<number>(7);
   const { data: chartData, isLoading, error } = useCoinChart(coinId, selectedRange);
 
-  // Transform API data into chart format
   const formattedData = chartData?.prices.map(([timestamp, price]) => ({
     date: formatDate(timestamp, selectedRange),
     price,
     timestamp,
   })) || [];
 
-  // Calculate price change for gradient color
   const priceChange =
     formattedData.length >= 2
       ? formattedData[formattedData.length - 1].price - formattedData[0].price
       : 0;
   const isPositive = priceChange >= 0;
 
-  // Sample data points for performance (max 100 points)
   const sampledData =
     formattedData.length > 100
       ? formattedData.filter((_, i) => i % Math.ceil(formattedData.length / 100) === 0)
       : formattedData;
 
   return (
-    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+    <Card className="glass neon-border overflow-hidden">
       <CardHeader className="flex flex-col gap-4 pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <CardTitle className="text-lg font-semibold">
-          {coinName} Price Chart
+        <CardTitle className="flex items-center gap-2 font-display text-lg font-semibold">
+          <TrendingUp className="h-5 w-5 text-primary" />
+          {coinName} Chart
+          <span className="text-sm font-normal text-muted-foreground">
+            {isPositive ? "📈 going up" : "📉 going down"}
+          </span>
         </CardTitle>
 
         {/* Time Range Selector */}
-        <div className="flex gap-1 rounded-lg bg-muted p-1">
+        <div className="flex gap-1 rounded-full bg-secondary/50 p-1">
           {timeRanges.map((range) => (
             <Button
               key={range.value}
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 px-3 text-xs font-medium transition-all",
+                "h-8 rounded-full px-4 text-xs font-semibold transition-all",
                 selectedRange === range.value
-                  ? "bg-background shadow-sm"
+                  ? "gradient-genz text-white shadow-lg"
                   : "text-muted-foreground hover:text-foreground"
               )}
               onClick={() => setSelectedRange(range.value)}
@@ -125,22 +118,18 @@ export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
       </CardHeader>
 
       <CardContent>
-        {/* Loading State */}
         {isLoading && (
           <div className="flex h-[300px] items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           </div>
         )}
 
-        {/* Error State */}
         {error && (
           <div className="flex h-[300px] flex-col items-center justify-center text-center">
-            <p className="text-destructive">Failed to load chart data</p>
-            <p className="text-sm text-muted-foreground">Please try again later</p>
+            <p className="text-muted-foreground">chart machine broke 😅</p>
           </div>
         )}
 
-        {/* Chart */}
         {!isLoading && !error && sampledData.length > 0 && (
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -149,21 +138,31 @@ export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
                   <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
                     <stop
                       offset="0%"
-                      stopColor={isPositive ? "hsl(var(--success))" : "hsl(var(--destructive))"}
-                      stopOpacity={0.3}
+                      stopColor={isPositive ? "hsl(142, 76%, 55%)" : "hsl(0, 85%, 65%)"}
+                      stopOpacity={0.4}
+                    />
+                    <stop
+                      offset="50%"
+                      stopColor="hsl(270, 91%, 70%)"
+                      stopOpacity={0.2}
                     />
                     <stop
                       offset="100%"
-                      stopColor={isPositive ? "hsl(var(--success))" : "hsl(var(--destructive))"}
+                      stopColor="hsl(330, 90%, 70%)"
                       stopOpacity={0}
                     />
+                  </linearGradient>
+                  <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="hsl(270, 91%, 70%)" />
+                    <stop offset="50%" stopColor="hsl(330, 90%, 70%)" />
+                    <stop offset="100%" stopColor="hsl(180, 90%, 60%)" />
                   </linearGradient>
                 </defs>
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                  tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
                   tickMargin={10}
                   interval="preserveStartEnd"
                   minTickGap={50}
@@ -172,7 +171,7 @@ export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
                   domain={["dataMin", "dataMax"]}
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }}
+                  tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
                   tickFormatter={(value) => formatPrice(value).replace("$", "")}
                   width={70}
                 />
@@ -180,8 +179,8 @@ export function PriceChart({ coinId, coinName = "Bitcoin" }: PriceChartProps) {
                 <Area
                   type="monotone"
                   dataKey="price"
-                  stroke={isPositive ? "hsl(var(--success))" : "hsl(var(--destructive))"}
-                  strokeWidth={2}
+                  stroke="url(#lineGradient)"
+                  strokeWidth={2.5}
                   fill="url(#colorPrice)"
                   animationDuration={500}
                 />

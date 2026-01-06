@@ -1,15 +1,10 @@
 /**
- * PulseTrack - Crypto Dashboard
+ * PulseTrack - Gen Z Crypto Dashboard ✨
  * 
- * A modern, mobile-first cryptocurrency dashboard featuring:
- * - Live price data from CoinGecko API
- * - Interactive charts and market statistics
- * - Search functionality and watchlist
- * - Dark/Light mode toggle
- * - Fully responsive design
+ * Neon vibes, glassmorphism, and real-time crypto data
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { MarketStatsCards } from "@/components/dashboard/MarketStatsCards";
@@ -18,15 +13,20 @@ import { PriceChart } from "@/components/dashboard/PriceChart";
 import { TrendingCoins } from "@/components/dashboard/TrendingCoins";
 
 const Index = () => {
-  // Currently selected coin for the chart
   const [selectedCoin, setSelectedCoin] = useState({
     id: "bitcoin",
     name: "Bitcoin",
   });
 
-  // Handler for selecting a coin from search or table
+  // Default to dark mode (Gen Z loves dark mode)
+  useEffect(() => {
+    if (!localStorage.getItem("theme")) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+  }, []);
+
   const handleSelectCoin = (coinId: string) => {
-    // Map common coins to their names, or capitalize the ID
     const coinNames: Record<string, string> = {
       bitcoin: "Bitcoin",
       ethereum: "Ethereum",
@@ -46,11 +46,20 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header with Search and Theme Toggle */}
-      <DashboardHeader onSelectCoin={handleSelectCoin} />
+      {/* Gradient Background Orbs */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
+        <div className="absolute -bottom-40 left-1/3 h-80 w-80 rounded-full bg-success/10 blur-3xl" />
+      </div>
+
+      {/* Header */}
+      <div className="relative">
+        <DashboardHeader onSelectCoin={handleSelectCoin} />
+      </div>
 
       {/* Main Content */}
-      <main className="container py-6 space-y-6">
+      <main className="container relative py-6 space-y-6">
         {/* Market Statistics Cards */}
         <section className="animate-fade-in">
           <MarketStatsCards />
@@ -58,22 +67,26 @@ const Index = () => {
 
         {/* Main Dashboard Grid */}
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column - Chart and Table (2/3 width on desktop) */}
+          {/* Left Column - Chart and Table */}
           <div className="space-y-6 lg:col-span-2">
-            {/* Price Chart */}
             <section className="animate-fade-in" style={{ animationDelay: "100ms" }}>
               <PriceChart coinId={selectedCoin.id} coinName={selectedCoin.name} />
             </section>
 
-            {/* Coin Table with Tabs */}
             <section className="animate-fade-in" style={{ animationDelay: "200ms" }}>
               <Tabs defaultValue="all" className="w-full">
-                <TabsList className="mb-4 w-full justify-start bg-muted/50">
-                  <TabsTrigger value="all" className="flex-1 sm:flex-none">
+                <TabsList className="mb-4 w-full justify-start rounded-full bg-secondary/50 p-1">
+                  <TabsTrigger 
+                    value="all" 
+                    className="flex-1 rounded-full data-[state=active]:gradient-genz data-[state=active]:text-white sm:flex-none"
+                  >
                     All Coins
                   </TabsTrigger>
-                  <TabsTrigger value="watchlist" className="flex-1 sm:flex-none">
-                    Watchlist
+                  <TabsTrigger 
+                    value="watchlist" 
+                    className="flex-1 rounded-full data-[state=active]:gradient-genz data-[state=active]:text-white sm:flex-none"
+                  >
+                    Watchlist ⭐
                   </TabsTrigger>
                 </TabsList>
 
@@ -88,7 +101,7 @@ const Index = () => {
             </section>
           </div>
 
-          {/* Right Column - Trending (1/3 width on desktop) */}
+          {/* Right Column - Trending */}
           <div className="space-y-6">
             <section className="animate-fade-in" style={{ animationDelay: "150ms" }}>
               <TrendingCoins onSelectCoin={handleSelectCoin} />
@@ -97,21 +110,15 @@ const Index = () => {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-border/50 pt-6 text-center text-sm text-muted-foreground">
-          <p>
-            Data provided by{" "}
-            <a
-              href="https://www.coingecko.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-primary hover:underline"
-            >
-              CoinGecko
-            </a>
-            . Prices update every 30 seconds.
+        <footer className="border-t border-border/30 pt-8 pb-4 text-center">
+          <p className="text-sm text-muted-foreground">
+            made with 💜 by{" "}
+            <span className="font-display font-bold text-gradient-genz">
+              PulseTrack
+            </span>
           </p>
-          <p className="mt-2">
-            Built with React, Tailwind CSS, and TanStack Query
+          <p className="mt-1 text-xs text-muted-foreground/60">
+            data from CoinGecko • not financial advice fr fr
           </p>
         </footer>
       </main>
