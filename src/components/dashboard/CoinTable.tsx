@@ -11,7 +11,7 @@ import { useTopCoins } from "@/hooks/useCryptoData";
 import { useWatchlist } from "@/hooks/useWatchlist";
 import { cn } from "@/lib/utils";
 import type { CoinMarketData } from "@/services/cryptoApi";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 
 interface CoinTableProps {
   onSelectCoin?: (coinId: string) => void;
@@ -184,137 +184,139 @@ function CoinRowSkeleton() {
   );
 }
 
-export function CoinTable({ onSelectCoin, showWatchlistOnly = false }: CoinTableProps) {
-  const { data: coins, isLoading, error } = useTopCoins(1, 20);
-  const { isInWatchlist, toggleWatchlist, watchlist } = useWatchlist();
-  const [sortBy, setSortBy] = useState<"rank" | "price" | "change">("rank");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
+  function CoinTable({ onSelectCoin, showWatchlistOnly = false }, ref) {
+    const { data: coins, isLoading, error } = useTopCoins(1, 20);
+    const { isInWatchlist, toggleWatchlist, watchlist } = useWatchlist();
+    const [sortBy, setSortBy] = useState<"rank" | "price" | "change">("rank");
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
-  const filteredCoins = coins
-    ? showWatchlistOnly
-      ? coins.filter((coin) => watchlist.includes(coin.id))
-      : coins
-    : [];
+    const filteredCoins = coins
+      ? showWatchlistOnly
+        ? coins.filter((coin) => watchlist.includes(coin.id))
+        : coins
+      : [];
 
-  const sortedCoins = [...filteredCoins].sort((a, b) => {
-    let comparison = 0;
-    switch (sortBy) {
-      case "rank":
-        comparison = a.market_cap_rank - b.market_cap_rank;
-        break;
-      case "price":
-        comparison = a.current_price - b.current_price;
-        break;
-      case "change":
-        comparison = a.price_change_percentage_24h - b.price_change_percentage_24h;
-        break;
-    }
-    return sortOrder === "asc" ? comparison : -comparison;
-  });
+    const sortedCoins = [...filteredCoins].sort((a, b) => {
+      let comparison = 0;
+      switch (sortBy) {
+        case "rank":
+          comparison = a.market_cap_rank - b.market_cap_rank;
+          break;
+        case "price":
+          comparison = a.current_price - b.current_price;
+          break;
+        case "change":
+          comparison = a.price_change_percentage_24h - b.price_change_percentage_24h;
+          break;
+      }
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
 
-  const handleSort = (column: "rank" | "price" | "change") => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(column);
-      setSortOrder("asc");
-    }
-  };
+    const handleSort = (column: "rank" | "price" | "change") => {
+      if (sortBy === column) {
+        setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      } else {
+        setSortBy(column);
+        setSortOrder("asc");
+      }
+    };
 
-  return (
-    <Card className="glass neon-border overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
-        <CardTitle className="flex items-center gap-2 font-display text-lg font-semibold">
-          <Sparkles className="h-5 w-5 text-primary" />
-          {showWatchlistOnly ? "Your Faves ⭐" : "Top Coins"}
-        </CardTitle>
-        {!showWatchlistOnly && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="hidden sm:inline">live prices</span>
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-            </span>
-          </div>
-        )}
-      </CardHeader>
-      <CardContent className="overflow-auto p-0">
-        {error ? (
-          <div className="p-8 text-center">
-            <p className="text-muted-foreground">bruh, something went wrong 😭</p>
-          </div>
-        ) : showWatchlistOnly && watchlist.length === 0 ? (
-          <div className="p-8 text-center">
-            <Star className="mx-auto h-12 w-12 text-muted-foreground/30" />
-            <p className="mt-4 text-muted-foreground">no faves yet 🥺</p>
-            <p className="text-sm text-muted-foreground">
-              tap the star to add some
-            </p>
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border/50 bg-secondary/30 text-xs font-semibold text-muted-foreground">
-                <th
-                  className="cursor-pointer whitespace-nowrap px-3 py-3 text-left"
-                  onClick={() => handleSort("rank")}
-                >
-                  <div className="flex items-center gap-1">
-                    #
-                    {sortBy === "rank" && (
-                      sortOrder === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
-                    )}
-                  </div>
-                </th>
-                <th className="whitespace-nowrap px-3 py-3 text-left">Name</th>
-                <th
-                  className="cursor-pointer whitespace-nowrap px-3 py-3 text-right"
-                  onClick={() => handleSort("price")}
-                >
-                  <div className="flex items-center justify-end gap-1">
-                    Price
-                    {sortBy === "price" && (
-                      sortOrder === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
-                    )}
-                  </div>
-                </th>
-                <th
-                  className="cursor-pointer whitespace-nowrap px-3 py-3 text-right"
-                  onClick={() => handleSort("change")}
-                >
-                  <div className="flex items-center justify-end gap-1">
-                    24h
-                    {sortBy === "change" && (
-                      sortOrder === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
-                    )}
-                  </div>
-                </th>
-                <th className="hidden whitespace-nowrap px-3 py-3 text-right md:table-cell">Market Cap</th>
-                <th className="hidden whitespace-nowrap px-3 py-3 text-right lg:table-cell">Volume</th>
-                <th className="hidden whitespace-nowrap px-3 py-3 text-left md:table-cell">7d Chart</th>
-                <th className="whitespace-nowrap px-3 py-3 text-left">
-                  <Star className="h-4 w-4" />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoading ? (
-                [...Array(10)].map((_, i) => <CoinRowSkeleton key={i} />)
-              ) : (
-                sortedCoins.map((coin) => (
-                  <CoinRow
-                    key={coin.id}
-                    coin={coin}
-                    isInWatchlist={isInWatchlist(coin.id)}
-                    onToggleWatchlist={() => toggleWatchlist(coin.id)}
-                    onSelect={() => onSelectCoin?.(coin.id)}
-                  />
-                ))
-              )}
-            </tbody>
-          </table>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
+    return (
+      <Card ref={ref} className="glass neon-border overflow-hidden">
+        <CardHeader className="flex flex-row items-center justify-between pb-4">
+          <CardTitle className="flex items-center gap-2 font-display text-lg font-semibold">
+            <Sparkles className="h-5 w-5 text-primary" />
+            {showWatchlistOnly ? "Your Faves ⭐" : "Top Coins"}
+          </CardTitle>
+          {!showWatchlistOnly && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="hidden sm:inline">live prices</span>
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+              </span>
+            </div>
+          )}
+        </CardHeader>
+        <CardContent className="overflow-auto p-0">
+          {error ? (
+            <div className="p-8 text-center">
+              <p className="text-muted-foreground">bruh, something went wrong 😭</p>
+            </div>
+          ) : showWatchlistOnly && watchlist.length === 0 ? (
+            <div className="p-8 text-center">
+              <Star className="mx-auto h-12 w-12 text-muted-foreground/30" />
+              <p className="mt-4 text-muted-foreground">no faves yet 🥺</p>
+              <p className="text-sm text-muted-foreground">
+                tap the star to add some
+              </p>
+            </div>
+          ) : (
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border/50 bg-secondary/30 text-xs font-semibold text-muted-foreground">
+                  <th
+                    className="cursor-pointer whitespace-nowrap px-3 py-3 text-left"
+                    onClick={() => handleSort("rank")}
+                  >
+                    <div className="flex items-center gap-1">
+                      #
+                      {sortBy === "rank" && (
+                        sortOrder === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="whitespace-nowrap px-3 py-3 text-left">Name</th>
+                  <th
+                    className="cursor-pointer whitespace-nowrap px-3 py-3 text-right"
+                    onClick={() => handleSort("price")}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      Price
+                      {sortBy === "price" && (
+                        sortOrder === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                      )}
+                    </div>
+                  </th>
+                  <th
+                    className="cursor-pointer whitespace-nowrap px-3 py-3 text-right"
+                    onClick={() => handleSort("change")}
+                  >
+                    <div className="flex items-center justify-end gap-1">
+                      24h
+                      {sortBy === "change" && (
+                        sortOrder === "asc" ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="hidden whitespace-nowrap px-3 py-3 text-right md:table-cell">Market Cap</th>
+                  <th className="hidden whitespace-nowrap px-3 py-3 text-right lg:table-cell">Volume</th>
+                  <th className="hidden whitespace-nowrap px-3 py-3 text-left md:table-cell">7d Chart</th>
+                  <th className="whitespace-nowrap px-3 py-3 text-left">
+                    <Star className="h-4 w-4" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoading ? (
+                  [...Array(10)].map((_, i) => <CoinRowSkeleton key={i} />)
+                ) : (
+                  sortedCoins.map((coin) => (
+                    <CoinRow
+                      key={coin.id}
+                      coin={coin}
+                      isInWatchlist={isInWatchlist(coin.id)}
+                      onToggleWatchlist={() => toggleWatchlist(coin.id)}
+                      onSelect={() => onSelectCoin?.(coin.id)}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+);
