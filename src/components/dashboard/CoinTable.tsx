@@ -4,15 +4,17 @@
  * Displays cryptocurrency data with neon styling
  */
 
-import { Star, TrendingUp, TrendingDown, ChevronUp, ChevronDown, Sparkles } from "lucide-react";
+import { Star, TrendingUp, TrendingDown, ChevronUp, ChevronDown, Sparkles, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTopCoins } from "@/hooks/useCryptoData";
 import { useWatchlist } from "@/hooks/useWatchlist";
+import { usePriceAlerts } from "@/hooks/usePriceAlerts";
 import { cn } from "@/lib/utils";
 import type { CoinMarketData } from "@/services/cryptoApi";
 import { useState, forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { PriceAlertDialog } from "./PriceAlertDialog";
 
 interface CoinTableProps {
   onSelectCoin?: (coinId: string) => void;
@@ -69,11 +71,20 @@ function CoinRow({
   isInWatchlist,
   onToggleWatchlist,
   onSelect,
+  onCreateAlert,
 }: {
   coin: CoinMarketData;
   isInWatchlist: boolean;
   onToggleWatchlist: () => void;
   onSelect: () => void;
+  onCreateAlert: (
+    coinId: string,
+    coinName: string,
+    coinSymbol: string,
+    coinImage: string,
+    targetPrice: number,
+    condition: "above" | "below"
+  ) => void;
 }) {
   const isPositive = coin.price_change_percentage_24h >= 0;
 
@@ -140,23 +151,43 @@ function CoinRow({
         />
       </td>
 
-      <td className="whitespace-nowrap px-1 sm:px-3 py-3 sm:py-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 sm:h-9 sm:w-9 rounded-full transition-all hover:bg-warning/20"
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleWatchlist();
-          }}
-        >
-          <Star
-            className={cn(
-              "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-all",
-              isInWatchlist ? "fill-warning text-warning" : "text-muted-foreground"
-            )}
+      <td className="whitespace-nowrap px-1 sm:px-2 py-3 sm:py-4">
+        <div className="flex items-center gap-0.5">
+          <PriceAlertDialog
+            coinId={coin.id}
+            coinName={coin.name}
+            coinSymbol={coin.symbol}
+            coinImage={coin.image}
+            currentPrice={coin.current_price}
+            onCreateAlert={onCreateAlert}
+            trigger={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all hover:bg-primary/20"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Bell className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground hover:text-primary" />
+              </Button>
+            }
           />
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all hover:bg-warning/20"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleWatchlist();
+            }}
+          >
+            <Star
+              className={cn(
+                "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-all",
+                isInWatchlist ? "fill-warning text-warning" : "text-muted-foreground"
+              )}
+            />
+          </Button>
+        </div>
       </td>
     </tr>
   );
@@ -180,7 +211,7 @@ function CoinRowSkeleton() {
       <td className="hidden px-3 py-4 md:table-cell"><div className="ml-auto h-4 w-20 rounded bg-muted shimmer" /></td>
       <td className="hidden px-3 py-4 lg:table-cell"><div className="ml-auto h-4 w-20 rounded bg-muted shimmer" /></td>
       <td className="hidden px-3 py-4 md:table-cell"><div className="h-8 w-24 rounded bg-muted shimmer" /></td>
-      <td className="px-3 py-4"><div className="h-9 w-9 rounded-full bg-muted shimmer" /></td>
+      <td className="px-3 py-4"><div className="h-9 w-16 rounded bg-muted shimmer" /></td>
     </tr>
   );
 }
@@ -190,6 +221,7 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
     const navigate = useNavigate();
     const { data: coins, isLoading, error } = useTopCoins(1, 20);
     const { isInWatchlist, toggleWatchlist, watchlist } = useWatchlist();
+    const { addAlert } = usePriceAlerts();
     const [sortBy, setSortBy] = useState<"rank" | "price" | "change">("rank");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
     
@@ -319,6 +351,7 @@ export const CoinTable = forwardRef<HTMLDivElement, CoinTableProps>(
                       isInWatchlist={isInWatchlist(coin.id)}
                       onToggleWatchlist={() => toggleWatchlist(coin.id)}
                       onSelect={() => handleSelectCoin(coin.id)}
+                      onCreateAlert={addAlert}
                     />
                   ))
                 )}
